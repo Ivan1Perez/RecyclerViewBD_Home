@@ -1,5 +1,8 @@
 package com.example.myrecyclerviewexample.model;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,4 +40,24 @@ public class Model {
         }
         return oficios;
     }
+
+//    public boolean addUser(Usuario u){
+//
+//        String sql = "INSERT INTO EMPLEADO (nombre,apellidos,Oficio_idOficio)" +
+//                "VALUES ('" + u
+//                "idUsuario='"+u.+"', "+
+//                "nombre='"+u.getNombre()+"'"+
+//                "apellidos='"+u.getApellidos()+"'";
+//
+//        try(Connection connection = MyDataSource.getMySQLDataSource().getConnection();
+//            Statement stmnt = connection.createStatement();
+//        ) {
+//
+//            return stmnt.execute(sql);
+//
+//        } catch (SQLException ex) {
+//            throw new RuntimeException(ex);
+//        }
+//
+//    }
 }
