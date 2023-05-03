@@ -1,5 +1,5 @@
 package com.example.myrecyclerviewexample.model;
-//prueba
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
