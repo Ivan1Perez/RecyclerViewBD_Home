@@ -24,6 +24,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     private RecyclerView recyclerView;
     private MyRecyclerViewAdapter myRecyclerViewAdapter;
+    private ActivityResultLauncher<Intent> detailActivityLauncher;
+
+    private boolean isUpdating;
+
     private FloatingActionButton addUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
         recyclerView = findViewById(R.id.recycler);
         addUser = findViewById(R.id.addUser);
+        isUpdating = false;
 
 
         myRecyclerViewAdapter = new MyRecyclerViewAdapter(this);
@@ -44,26 +49,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, RecyclerView.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
 
-        ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
+
+
+        detailActivityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    // No es necesario identificar la actividad que envia resultados
-                    if (result.getResultCode() == RESULT_CANCELED)
-                        Toast.makeText(this, "Cancelado por el usuario", Toast.LENGTH_LONG).show();
-                    else if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        Usuario usuario = (Usuario) data.getExtras().getSerializable("usuario");
-                        UsuarioRepository.getInstance().add(usuario);
+                    if(result.getResultCode()== Activity.RESULT_OK)
                         myRecyclerViewAdapter.notifyDataSetChanged();
-                        Toast.makeText(this, "Nuevo: " + usuario.getNombre() +" "+ usuario.getApellidos() , Toast.LENGTH_LONG).show();
+                    else{
+                        Toast.makeText(this,"Cancelado por el usuario",Toast.LENGTH_SHORT).show();
                     }
                 }
         );
-
-        addUser.setOnClickListener(v -> {
-            Intent i = new Intent(this, AddUser.class);
-            someActivityResultLauncher.launch(i);
-        });
 
         showProgress();
         executeCall(this);
@@ -72,7 +68,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void onClick(View view) {
         Usuario u = Model.getInstance().getUsuarios().get(recyclerView.getChildAdapterPosition(view));
-        Toast.makeText(this,"Clic en " + u.getOficio(),Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(getApplicationContext(),UserFormActivity.class);
+        intent.putExtra("mode",UserFormActivity.MODE.UPDATE.toString());
+        intent.putExtra("user",u);
+        detailActivityLauncher.launch(intent);
+
+//        Toast.makeText(this,"Clic en " + u.getOficio(),Toast.LENGTH_SHORT).show();
     }
 
     @Override

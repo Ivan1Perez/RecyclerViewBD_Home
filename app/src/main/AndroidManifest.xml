@@ -14,7 +14,7 @@
         android:theme="@style/Theme.MyRecyclerViewExample"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".AddUser"
+            android:name=".UserFormActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
