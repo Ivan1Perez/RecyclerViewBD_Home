@@ -1,11 +1,16 @@
 package com.example.myrecyclerviewexample;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 
 import com.example.myrecyclerviewexample.base.BaseActivity;
 import com.example.myrecyclerviewexample.base.CallInterface;
+import com.example.myrecyclerviewexample.model.Model;
+import com.example.myrecyclerviewexample.model.Oficio;
 import com.example.myrecyclerviewexample.model.Usuario;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -23,6 +28,7 @@ public class UserFormActivity extends BaseActivity {
     private Button btnCrear;
     private TextInputEditText tietApellidos;
     private TextInputEditText tietNombre;
+    private Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +42,13 @@ public class UserFormActivity extends BaseActivity {
         btnCancelar = findViewById(R.id.btnCancelar);
         tietNombre = findViewById(R.id.tietNombre);
         tietApellidos = findViewById(R.id.tietApellidos);
+        spinner = findViewById(R.id.spinner);
+
+        ArrayAdapter<Oficio> myAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                Model.getInstance().getOficios());
+        spinner.setAdapter(myAdapter);
 
         switch (mode){
             case UPDATE:
@@ -60,7 +73,7 @@ public class UserFormActivity extends BaseActivity {
                     executeCall(new CallInterface() {
                         @Override
                         public void doInBackground() {
-
+                            Intent i = new Intent();
                         }
 
                         @Override

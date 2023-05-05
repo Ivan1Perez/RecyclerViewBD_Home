@@ -53,8 +53,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
         detailActivityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if(result.getResultCode()== Activity.RESULT_OK)
+                    if(result.getResultCode()== Activity.RESULT_OK){
                         myRecyclerViewAdapter.notifyDataSetChanged();
+                    }
                     else{
                         Toast.makeText(this,"Cancelado por el usuario",Toast.LENGTH_SHORT).show();
                     }

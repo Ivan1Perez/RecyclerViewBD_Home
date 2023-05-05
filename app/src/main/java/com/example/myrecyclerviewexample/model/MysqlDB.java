@@ -17,7 +17,7 @@ public class MysqlDB {
             throw new RuntimeException(e);
         }
 
-        return DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/java","iperez","1111");
+        return DriverManager.getConnection("jdbc:mysql://10.13.0.3:3306/java","iperez","1111");
     }
 
     public List<Usuario> getAllUsers(){
@@ -63,5 +63,25 @@ public class MysqlDB {
             e.printStackTrace();
         }
         return oficios;
+    }
+
+    public boolean addUsuario(Usuario u){
+
+        String sql = "INSERT INTO Usuario (nombre,apellidos,Oficio_idOficio)" +
+                "VALUES ('" +
+                "nombre='"+u.getNombre()+"', "+
+                "apellidos='"+u.getApellidos()+"'"+
+                "Oficio_idOficio='"+u.getIdUsuario()+"'";
+
+        try(Connection connection = getConnection();
+            Statement stmnt = connection.createStatement();
+        ) {
+
+            return stmnt.execute(sql);
+
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+
     }
 }
