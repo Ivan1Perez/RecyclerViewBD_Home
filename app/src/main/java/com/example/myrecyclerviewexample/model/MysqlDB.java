@@ -71,7 +71,7 @@ public class MysqlDB {
                 "VALUES ('" +
                 u.getNombre()+"', '"+
                 u.getApellidos()+"', "+
-                u.getIdUsuario()+")";
+                u.getOficio()+")";
 
         try(Connection connection = getConnection();
             Statement stmnt = connection.createStatement();) {

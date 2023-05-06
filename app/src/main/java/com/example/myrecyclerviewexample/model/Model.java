@@ -43,8 +43,10 @@ public class Model {
 
     public boolean addUsuario(Usuario u){
         MysqlDB mysqlDB = new MysqlDB();
+        boolean operationDone = mysqlDB.addNewUsuario(u);
+        usuarios = mysqlDB.getAllUsers();
 
-        return mysqlDB.addNewUsuario(u);
+        return operationDone;
 
     }
 

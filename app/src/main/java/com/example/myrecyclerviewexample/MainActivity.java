@@ -51,8 +51,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
         detailActivityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
+                    boolean addSuccessful;
+
                     if(result.getResultCode()== Activity.RESULT_OK){
+                        myRecyclerViewAdapter.setUsuarios(Model.getInstance().getUsuarios());
                         myRecyclerViewAdapter.notifyDataSetChanged();
+
+                        addSuccessful = getIntent().getBooleanExtra("addSuccessful", true);
+
+                        if(addSuccessful){
+                            Toast.makeText(this,"Usuario añadido con éxito",Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(this,"Error al añadir el usuario",Toast.LENGTH_SHORT).show();
+                        }
+
                     }
                     else{
                         Toast.makeText(this,"Cancelado por el usuario",Toast.LENGTH_SHORT).show();

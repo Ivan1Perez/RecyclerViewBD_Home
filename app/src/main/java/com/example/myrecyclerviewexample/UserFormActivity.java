@@ -95,16 +95,18 @@ public class UserFormActivity extends BaseActivity {
                         executeCall(new CallInterface() {
                             @Override
                             public void doInBackground() {
+                                boolean addSuccessful;
                                 Intent i = new Intent();
                                 String nombre = tietNombre.getText().toString();
                                 String apellidos = tietApellidos.getText().toString();
                                 Oficio oficio = (Oficio) spinner.getSelectedItem();
 
                                 Usuario usuario = new Usuario(nombre, apellidos, oficio.getIdOficio());
-                                i.putExtra("usuario",usuario);
+                                addSuccessful = Model.getInstance().addUsuario(usuario);
+                                i.putExtra("addSuccessful", addSuccessful);
+
                                 setResult(RESULT_OK,i);
 
-                                Model.getInstance().addUsuario(usuario);
                             }
 
                             @Override
