@@ -8,6 +8,12 @@ public class Usuario implements Serializable {
     private String apellidos;
     private int oficio;
 
+    public Usuario(String nombre, String apellidos, int oficio) {
+        this.nombre = nombre;
+        this.apellidos = apellidos;
+        this.oficio = oficio;
+    }
+
     public Usuario(int idUsuario, String nombre, String apellidos, int oficio) {
         this.idUsuario = idUsuario;
         this.nombre = nombre;

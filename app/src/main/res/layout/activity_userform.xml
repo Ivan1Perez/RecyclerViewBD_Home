@@ -21,7 +21,8 @@
             android:id="@+id/tietNombre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nombre" />
+            android:hint="Nombre"
+            android:text=""/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -39,7 +40,8 @@
             android:id="@+id/tietApellidos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Apellidos" />
+            android:hint="Apellidos"
+            android:text=""/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <Spinner
@@ -54,12 +56,12 @@
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
 
     <Button
-        android:id="@+id/btnCrear"
+        android:id="@+id/btnAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
         android:layout_marginEnd="32dp"
-        android:text="Crear"
+        android:text="Añadir"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinner" />
 
@@ -74,7 +76,7 @@
         app:layout_constraintTop_toBottomOf="@+id/spinner" />
 
     <Button
-        android:id="@+id/btnSave"
+        android:id="@+id/btnUpdate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"

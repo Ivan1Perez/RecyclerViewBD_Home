@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.myrecyclerviewexample.base.BaseActivity;
 import com.example.myrecyclerviewexample.base.CallInterface;
@@ -23,9 +24,9 @@ public class UserFormActivity extends BaseActivity {
     }
 
     private Usuario usuario;
-    private Button btnSave;
+    private Button btnUpdate;
     private Button btnCancelar;
-    private Button btnCrear;
+    private Button btnAdd;
     private TextInputEditText tietApellidos;
     private TextInputEditText tietNombre;
     private Spinner spinner;
@@ -37,8 +38,8 @@ public class UserFormActivity extends BaseActivity {
 
         MODE mode = MODE.valueOf(getIntent().getExtras().getString("mode"));
 
-        btnSave = findViewById(R.id.btnSave);
-        btnCrear = findViewById(R.id.btnCrear);
+        btnUpdate = findViewById(R.id.btnUpdate);
+        btnAdd = findViewById(R.id.btnAdd);
         btnCancelar = findViewById(R.id.btnCancelar);
         tietNombre = findViewById(R.id.tietNombre);
         tietApellidos = findViewById(R.id.tietApellidos);
@@ -55,10 +56,10 @@ public class UserFormActivity extends BaseActivity {
                 usuario = (Usuario) getIntent().getExtras().getSerializable("user");
                 tietNombre.setText(usuario.getNombre());
                 tietApellidos.setText(usuario.getApellidos());
-                btnCrear.setVisibility(View.GONE);
+                btnAdd.setVisibility(View.GONE);
                 break;
             case CREATE:
-                btnSave.setVisibility(View.GONE);
+                btnUpdate.setVisibility(View.GONE);
                 break;
 
         }
@@ -67,38 +68,53 @@ public class UserFormActivity extends BaseActivity {
                 view -> finish()
         );
 
-        btnSave.setOnClickListener(
+        btnUpdate.setOnClickListener(
                 v-> {
                     showProgress();
                     executeCall(new CallInterface() {
                         @Override
                         public void doInBackground() {
-                            Intent i = new Intent();
+
                         }
 
                         @Override
                         public void doInUI() {
                             hideProgress();
-
+                            finish();
                         }
                     });
                 }
         );
 
-        btnCrear.setOnClickListener(
+        btnAdd.setOnClickListener(
                 v -> {
-                    showProgress();
-                    executeCall(new CallInterface() {
-                        @Override
-                        public void doInBackground() {
+                    if(tietNombre.getText().length()==0 || tietApellidos.getText().length()==0){
+                        Toast.makeText(this,"Por favor, rellene los dos campos.",Toast.LENGTH_SHORT).show();
+                    }else{
+                        showProgress();
+                        executeCall(new CallInterface() {
+                            @Override
+                            public void doInBackground() {
+                                Intent i = new Intent();
+                                String nombre = tietNombre.getText().toString();
+                                String apellidos = tietApellidos.getText().toString();
+                                Oficio oficio = (Oficio) spinner.getSelectedItem();
 
-                        }
+                                Usuario usuario = new Usuario(nombre, apellidos, oficio.getIdOficio());
+                                i.putExtra("usuario",usuario);
+                                setResult(RESULT_OK,i);
 
-                        @Override
-                        public void doInUI() {
-                            hideProgress();
-                        }
-                    });
+                                Model.getInstance().addUsuario(usuario);
+                            }
+
+                            @Override
+                            public void doInUI() {
+                                hideProgress();
+                                finish();
+                            }
+                        });
+                    }
+
                 }
         );
 

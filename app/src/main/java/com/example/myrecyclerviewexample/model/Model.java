@@ -41,23 +41,12 @@ public class Model {
         return oficios;
     }
 
+    public boolean addUsuario(Usuario u){
+        MysqlDB mysqlDB = new MysqlDB();
 
+        return mysqlDB.addNewUsuario(u);
 
-//    public int updateUsuario(Usuario u){
-//
-//        String sql = "UPDATE Usuario SET nombre='"+ u.getNombre()+"',apellidos='"+ u.getApellidos()+"',Oficio_idOficio="+u.getOficio()+"WHERE idUsuario = " + u.getIdUsuario();
-//
-//        try(Connection connection= getConnection();
-//            Statement stmnt = connection.createStatement();
-//        ) {
-//
-//            return  stmnt.executeUpdate(sql);
-//
-//        } catch (SQLException ex) {
-//            throw new RuntimeException(ex);
-//        }
-//
-//    }
+    }
 
 
 }

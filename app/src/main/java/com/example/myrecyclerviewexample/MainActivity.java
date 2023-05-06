@@ -49,8 +49,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, RecyclerView.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
 
-
-
         detailActivityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if(result.getResultCode()== Activity.RESULT_OK){
@@ -61,6 +59,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     }
                 }
         );
+
+        addUser.setOnClickListener(v -> {
+            Intent i = new Intent(this, UserFormActivity.class);
+            i.putExtra("mode",UserFormActivity.MODE.CREATE.toString());
+            detailActivityLauncher.launch(i);
+        });
 
         showProgress();
         executeCall(this);
