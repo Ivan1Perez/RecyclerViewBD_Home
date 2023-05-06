@@ -2,7 +2,9 @@ package com.example.myrecyclerviewexample;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,6 +19,7 @@ import com.example.myrecyclerviewexample.base.CallInterface;
 import com.example.myrecyclerviewexample.model.Model;
 import com.example.myrecyclerviewexample.model.Usuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -26,8 +29,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private MyRecyclerViewAdapter myRecyclerViewAdapter;
     private ActivityResultLauncher<Intent> detailActivityLauncher;
 
-    private boolean isUpdating;
-
     private FloatingActionButton addUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +37,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
         recyclerView = findViewById(R.id.recycler);
         addUser = findViewById(R.id.addUser);
-        isUpdating = false;
-
 
         myRecyclerViewAdapter = new MyRecyclerViewAdapter(this);
         myRecyclerViewAdapter.setOnClickListener(this);
@@ -49,20 +48,55 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, RecyclerView.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
 
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT) {
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+
+                Usuario u = Model.getInstance().getUsuarios().get(viewHolder.getAdapterPosition());
+
+                myRecyclerViewAdapter.notifyItemRemoved(position);
+                Model.getInstance().deleteUsuario(u);
+
+                Snackbar.make(recyclerView, "Deleted " + u.getNombre(), Snackbar.LENGTH_LONG)
+                        .setAction("Undo", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                                myRecyclerViewAdapter.notifyItemInserted(position);
+                            }
+                        })
+                        .show();
+            }
+        });
+
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
         detailActivityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    boolean addSuccessful;
+                    boolean operationSuccessful = false;
+                    String operationToast = "";
 
                     if(result.getResultCode()== Activity.RESULT_OK){
                         myRecyclerViewAdapter.setUsuarios(Model.getInstance().getUsuarios());
                         myRecyclerViewAdapter.notifyDataSetChanged();
 
-                        addSuccessful = getIntent().getBooleanExtra("addSuccessful", true);
+                        Intent data = result.getData();
+                        if (data != null) {
+                            operationSuccessful = data.getBooleanExtra("addSuccessful", false);
+                            operationToast = data.getStringExtra("operationToast");
+                        }
 
-                        if(addSuccessful){
-                            Toast.makeText(this,"Usuario añadido con éxito",Toast.LENGTH_SHORT).show();
+                        if(operationSuccessful){
+                            Toast.makeText(this,operationToast,Toast.LENGTH_SHORT).show();
                         }else{
-                            Toast.makeText(this,"Error al añadir el usuario",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this,operationToast,Toast.LENGTH_SHORT).show();
                         }
 
                     }

@@ -66,7 +66,6 @@ public class MysqlDB {
     }
 
     public boolean addNewUsuario(Usuario u){
-
         String sql = "INSERT INTO Usuario (nombre,apellidos,Oficio_idOficio)" +
                 "VALUES ('" +
                 u.getNombre()+"', '"+
@@ -80,5 +79,39 @@ public class MysqlDB {
             throw new RuntimeException(ex);
         }
 
+    }
+
+    public boolean updateUser(Usuario u) {
+        String sql = "UPDATE Usuario SET nombre = '" + u.getNombre() + "', apellidos = '" + u.getApellidos() + "', Oficio_idOficio = " + u.getOficio() + " WHERE idUsuario = " + u.getIdUsuario();
+        int rowsAffected;
+
+        try(Connection connection = getConnection();
+            Statement stmnt = connection.createStatement();) {
+
+            rowsAffected = stmnt.executeUpdate(sql);
+            if(rowsAffected > 0){
+                return true;
+            }
+            return false;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public boolean deleteUser(Usuario u) {
+        String sql = "DELETE FROM Usuario WHERE idUsuario = " + u.getIdUsuario();
+        int rowsAffected;
+
+        try(Connection connection = getConnection();
+            Statement stmnt = connection.createStatement();) {
+
+            rowsAffected = stmnt.executeUpdate(sql);
+            if(rowsAffected > 0){
+                return true;
+            }
+            return false;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

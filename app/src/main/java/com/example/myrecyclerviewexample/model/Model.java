@@ -50,5 +50,23 @@ public class Model {
 
     }
 
+    public boolean updateUsuario(Usuario u){
+        MysqlDB mysqlDB = new MysqlDB();
+        boolean operationDone = mysqlDB.updateUser(u);
+        usuarios = mysqlDB.getAllUsers();
+
+        return operationDone;
+
+    }
+
+    public boolean deleteUsuario(Usuario u){
+        MysqlDB mysqlDB = new MysqlDB();
+        boolean operationDone = mysqlDB.deleteUser(u);
+        usuarios = mysqlDB.getAllUsers();
+
+        return operationDone;
+
+    }
+
 
 }

@@ -70,19 +70,44 @@ public class UserFormActivity extends BaseActivity {
 
         btnUpdate.setOnClickListener(
                 v-> {
-                    showProgress();
-                    executeCall(new CallInterface() {
-                        @Override
-                        public void doInBackground() {
+                    if(tietNombre.getText().length()==0 || tietApellidos.getText().length()==0){
+                        Toast.makeText(this,"Por favor, rellene los dos campos.",Toast.LENGTH_SHORT).show();
+                    }else{
+                        showProgress();
+                        executeCall(new CallInterface() {
+                            @Override
+                            public void doInBackground() {
+                                boolean addSuccessful;
+                                String operationToast;
+                                Intent i = new Intent();
+                                String nombre = tietNombre.getText().toString();
+                                String apellidos = tietApellidos.getText().toString();
+                                Oficio oficio = (Oficio) spinner.getSelectedItem();
 
-                        }
+                                Usuario usuarioModificado = new Usuario(usuario.getIdUsuario(), nombre, apellidos, oficio.getIdOficio());
+                                addSuccessful = Model.getInstance().updateUsuario(usuarioModificado);
 
-                        @Override
-                        public void doInUI() {
-                            hideProgress();
-                            finish();
-                        }
-                    });
+                                if(addSuccessful){
+                                    operationToast = "Usuario actualizado con éxito";
+                                }else{
+                                    operationToast = "Error al actualizar el usuario";
+                                }
+
+                                i.putExtra("addSuccessful", addSuccessful);
+                                i.putExtra("operationToast", operationToast);
+
+                                setResult(RESULT_OK,i);
+
+                            }
+
+                            @Override
+                            public void doInUI() {
+                                hideProgress();
+                                finish();
+                            }
+                        });
+                    }
+
                 }
         );
 
@@ -96,6 +121,7 @@ public class UserFormActivity extends BaseActivity {
                             @Override
                             public void doInBackground() {
                                 boolean addSuccessful;
+                                String operationToast;
                                 Intent i = new Intent();
                                 String nombre = tietNombre.getText().toString();
                                 String apellidos = tietApellidos.getText().toString();
@@ -103,7 +129,15 @@ public class UserFormActivity extends BaseActivity {
 
                                 Usuario usuario = new Usuario(nombre, apellidos, oficio.getIdOficio());
                                 addSuccessful = Model.getInstance().addUsuario(usuario);
+
+                                if(addSuccessful){
+                                    operationToast = "Usuario añadido con éxito";
+                                }else{
+                                    operationToast = "Error al añadir el usuario";
+                                }
+
                                 i.putExtra("addSuccessful", addSuccessful);
+                                i.putExtra("operationToast", operationToast);
 
                                 setResult(RESULT_OK,i);
 
