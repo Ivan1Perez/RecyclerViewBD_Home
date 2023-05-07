@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.example.myrecyclerviewexample.base.BaseActivity;
 import com.example.myrecyclerviewexample.base.CallInterface;
 import com.example.myrecyclerviewexample.model.Model;
+import com.example.myrecyclerviewexample.model.Oficio;
 import com.example.myrecyclerviewexample.model.Usuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -28,8 +29,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private RecyclerView recyclerView;
     private MyRecyclerViewAdapter myRecyclerViewAdapter;
     private ActivityResultLauncher<Intent> detailActivityLauncher;
-
     private FloatingActionButton addUser;
+    private boolean undoClicked;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,21 +59,41 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
+                undoClicked = false;
 
                 Usuario u = Model.getInstance().getUsuarios().get(viewHolder.getAdapterPosition());
 
                 myRecyclerViewAdapter.notifyItemRemoved(position);
-                Model.getInstance().deleteUsuario(u);
 
-                Snackbar.make(recyclerView, "Deleted " + u.getNombre(), Snackbar.LENGTH_LONG)
+                Snackbar snackbar = Snackbar.make(recyclerView, "Deleted " + u.getNombre(), Snackbar.LENGTH_LONG)
                         .setAction("Undo", new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-
+                                undoClicked = true;
                                 myRecyclerViewAdapter.notifyItemInserted(position);
                             }
-                        })
-                        .show();
+                        });
+                snackbar.show();
+
+                snackbar.addCallback(new Snackbar.Callback() {
+                    @Override
+                    public void onDismissed(Snackbar snackbar, int event) {
+                        super.onDismissed(snackbar, event);
+                        if (!undoClicked) {
+                            executeCall(new CallInterface() {
+                                @Override
+                                public void doInBackground() {
+                                    Model.getInstance().deleteUsuario(u);
+                                }
+
+                                @Override
+                                public void doInUI() {
+                                }
+                            });
+                        }
+                    }
+                });
+
             }
         });
 
