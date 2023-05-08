@@ -38,7 +38,7 @@ public class Model {
         return oficios;
     }
 
-    public boolean addNewUsuario(Usuario u){
+    public boolean addUsuario(Usuario u){
         MysqlDB mysqlDB = new MysqlDB();
         boolean operationDone = mysqlDB.addNewUsuario(u);
         usuarios = mysqlDB.getAllUsers();
@@ -65,10 +65,9 @@ public class Model {
 
     }
 
-
-    public void reinsertUser(int position, Usuario u) {
+    public void insertDeletedUser(int position, Usuario u) {
         MysqlDB mysqlDB = new MysqlDB();
+        mysqlDB.addNewUsuario(u);
         usuarios = mysqlDB.getAllUsers();
-        usuarios.add(position, u);
     }
 }

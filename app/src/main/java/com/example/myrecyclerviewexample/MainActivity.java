@@ -17,7 +17,6 @@ import android.widget.Toast;
 import com.example.myrecyclerviewexample.base.BaseActivity;
 import com.example.myrecyclerviewexample.base.CallInterface;
 import com.example.myrecyclerviewexample.model.Model;
-import com.example.myrecyclerviewexample.model.Oficio;
 import com.example.myrecyclerviewexample.model.Usuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -84,7 +83,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                                 executeCall(new CallInterface() {
                                     @Override
                                     public void doInBackground() {
-                                        Model.getInstance().reinsertUser(position,u);
+                                        Model.getInstance().insertDeletedUser(position, u);
                                     }
 
                                     @Override

@@ -128,7 +128,7 @@ public class UserFormActivity extends BaseActivity {
                                 Oficio oficio = (Oficio) spinner.getSelectedItem();
 
                                 Usuario usuario = new Usuario(nombre, apellidos, oficio.getIdOficio());
-                                addSuccessful = Model.getInstance().addNewUsuario(usuario);
+                                addSuccessful = Model.getInstance().addUsuario(usuario);
 
                                 if(addSuccessful){
                                     operationToast = "Usuario añadido con éxito";
