@@ -30,7 +30,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private MyRecyclerViewAdapter myRecyclerViewAdapter;
     private ActivityResultLauncher<Intent> detailActivityLauncher;
     private FloatingActionButton addUser;
-    private boolean undoClicked;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,41 +59,43 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                undoClicked = false;
 
-                Usuario u = Model.getInstance().getUsuarios().get(viewHolder.getAdapterPosition());
-
-                myRecyclerViewAdapter.notifyItemRemoved(position);
-
-                Snackbar snackbar = Snackbar.make(recyclerView, "Deleted " + u.getNombre(), Snackbar.LENGTH_LONG)
-                        .setAction("Undo", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                undoClicked = true;
-                                myRecyclerViewAdapter.notifyItemInserted(position);
-                            }
-                        });
-                snackbar.show();
-
-                snackbar.addCallback(new Snackbar.Callback() {
+                Usuario u = Model.getInstance().getUsuarios().get(position);
+                showProgress();
+                executeCall(new CallInterface() {
                     @Override
-                    public void onDismissed(Snackbar snackbar, int event) {
-                        super.onDismissed(snackbar, event);
-                        if (!undoClicked) {
-                            executeCall(new CallInterface() {
-                                @Override
-                                public void doInBackground() {
-                                    Model.getInstance().deleteUsuario(u);
-                                }
+                    public void doInBackground() {
+                        Model.getInstance().deleteUsuario(u);
+                    }
 
-                                @Override
-                                public void doInUI() {
-                                }
-                            });
-                        }
+                    @Override
+                    public void doInUI() {
+                        hideProgress();
+                        myRecyclerViewAdapter.notifyItemRemoved(position);
+                        myRecyclerViewAdapter.setUsuarios(Model.getInstance().getUsuarios());
                     }
                 });
 
+                Snackbar.make(recyclerView, "Deleted " + u.getNombre(), Snackbar.LENGTH_LONG)
+                        .setAction("Undo", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                showProgress();
+                                executeCall(new CallInterface() {
+                                    @Override
+                                    public void doInBackground() {
+                                        Model.getInstance().reinsertUser(position,u);
+                                    }
+
+                                    @Override
+                                    public void doInUI() {
+                                        hideProgress();
+                                        myRecyclerViewAdapter.notifyItemInserted(position);
+                                        myRecyclerViewAdapter.setUsuarios(Model.getInstance().getUsuarios());
+                                    }
+                                });
+                            }
+                        }).show();
             }
         });
 
@@ -104,7 +106,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     boolean operationSuccessful = false;
                     String operationToast = "";
 
-                    if(result.getResultCode()== Activity.RESULT_OK){
+                    if (result.getResultCode() == Activity.RESULT_OK) {
                         myRecyclerViewAdapter.setUsuarios(Model.getInstance().getUsuarios());
                         myRecyclerViewAdapter.notifyDataSetChanged();
 
@@ -114,22 +116,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                             operationToast = data.getStringExtra("operationToast");
                         }
 
-                        if(operationSuccessful){
-                            Toast.makeText(this,operationToast,Toast.LENGTH_SHORT).show();
-                        }else{
-                            Toast.makeText(this,operationToast,Toast.LENGTH_SHORT).show();
+                        if (operationSuccessful) {
+                            Toast.makeText(this, operationToast, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, operationToast, Toast.LENGTH_SHORT).show();
                         }
 
-                    }
-                    else{
-                        Toast.makeText(this,"Cancelado por el usuario",Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Cancelado por el usuario", Toast.LENGTH_SHORT).show();
                     }
                 }
         );
 
         addUser.setOnClickListener(v -> {
             Intent i = new Intent(this, UserFormActivity.class);
-            i.putExtra("mode",UserFormActivity.MODE.CREATE.toString());
+            i.putExtra("mode", UserFormActivity.MODE.CREATE.toString());
             detailActivityLauncher.launch(i);
         });
 
@@ -141,9 +142,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     public void onClick(View view) {
         Usuario u = Model.getInstance().getUsuarios().get(recyclerView.getChildAdapterPosition(view));
 
-        Intent intent = new Intent(getApplicationContext(),UserFormActivity.class);
-        intent.putExtra("mode",UserFormActivity.MODE.UPDATE.toString());
-        intent.putExtra("user",u);
+        Intent intent = new Intent(getApplicationContext(), UserFormActivity.class);
+        intent.putExtra("mode", UserFormActivity.MODE.UPDATE.toString());
+        intent.putExtra("user", u);
         detailActivityLauncher.launch(intent);
 
 //        Toast.makeText(this,"Clic en " + u.getOficio(),Toast.LENGTH_SHORT).show();

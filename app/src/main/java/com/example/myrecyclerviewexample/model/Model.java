@@ -1,8 +1,5 @@
 package com.example.myrecyclerviewexample.model;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +38,7 @@ public class Model {
         return oficios;
     }
 
-    public boolean addUsuario(Usuario u){
+    public boolean addNewUsuario(Usuario u){
         MysqlDB mysqlDB = new MysqlDB();
         boolean operationDone = mysqlDB.addNewUsuario(u);
         usuarios = mysqlDB.getAllUsers();
@@ -69,4 +66,9 @@ public class Model {
     }
 
 
+    public void reinsertUser(int position, Usuario u) {
+        MysqlDB mysqlDB = new MysqlDB();
+        usuarios = mysqlDB.getAllUsers();
+        usuarios.add(position, u);
+    }
 }
