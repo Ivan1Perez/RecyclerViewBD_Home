@@ -40,17 +40,38 @@ public class Model {
 
     public boolean addUsuario(Usuario u){
         MysqlDB mysqlDB = new MysqlDB();
-        boolean operationDone = mysqlDB.addNewUsuario(u);
-        usuarios = mysqlDB.getAllUsers();
+        Usuario usuarioCreado = mysqlDB.addNewUsuario(u);
+        usuarios.add(u);
 
-        return operationDone;
+        return usuarioCreado != null;
+
+    }
+
+    public boolean addUsuarioById(int idUsuario, Usuario u){
+        MysqlDB mysqlDB = new MysqlDB();
+        Usuario usuarioCreado = mysqlDB.addNewUsuarioById(idUsuario,u);
+        usuarios.add(u);
+
+        return usuarioCreado != null;
 
     }
 
     public boolean updateUsuario(Usuario u){
+
         MysqlDB mysqlDB = new MysqlDB();
         boolean operationDone = mysqlDB.updateUser(u);
-        usuarios = mysqlDB.getAllUsers();
+
+        if(operationDone){
+            Usuario usuario = usuarios.stream()
+                    .filter(user->user.getIdUsuario()==1)
+                    .findFirst()
+                    .get();
+
+            usuario.setNombre(u.getNombre());
+            usuario.setApellidos(u.getApellidos());
+            usuario.setOficio(u.getOficio());
+        }
+
 
         return operationDone;
 
@@ -65,9 +86,4 @@ public class Model {
 
     }
 
-    public void insertDeletedUser(int position, Usuario u) {
-        MysqlDB mysqlDB = new MysqlDB();
-        mysqlDB.addNewUsuario(u);
-        usuarios = mysqlDB.getAllUsers();
-    }
 }

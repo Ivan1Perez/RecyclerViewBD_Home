@@ -2,6 +2,7 @@ package com.example.myrecyclerviewexample.model;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -17,7 +18,7 @@ public class MysqlDB {
             throw new RuntimeException(e);
         }
 
-        return DriverManager.getConnection("jdbc:mysql://192.168.1.36:3306/java","iperez","1111");
+        return DriverManager.getConnection("jdbc:mysql://10.13.0.3:3306/java","iperez","1111");
     }
 
     public List<Usuario> getAllUsers(){
@@ -65,16 +66,66 @@ public class MysqlDB {
         return oficios;
     }
 
-    public boolean addNewUsuario(Usuario u){
-        String sql = "INSERT INTO Usuario (nombre,apellidos,Oficio_idOficio)" +
-                "VALUES ('" +
-                u.getNombre()+"', '"+
-                u.getApellidos()+"', "+
-                u.getOficio()+")";
+//    public boolean addNewUsuario(Usuario u){
+//        String sql = "INSERT INTO Usuario (nombre,apellidos,Oficio_idOficio)" +
+//                "VALUES ('" +
+//                u.getNombre()+"', '"+
+//                u.getApellidos()+"', "+
+//                u.getOficio()+")";
+//
+//        try(Connection connection = getConnection();
+//            Statement stmnt = connection.createStatement();) {
+//            return stmnt.execute(sql);
+//        } catch (SQLException ex) {
+//            throw new RuntimeException(ex);
+//        }
+//
+//    }
 
-        try(Connection connection = getConnection();
-            Statement stmnt = connection.createStatement();) {
-            return stmnt.execute(sql);
+    public Usuario addNewUsuario(Usuario u){
+        String sql = "INSERT INTO Usuario (nombre,apellidos,Oficio_idOficio) VALUES (?,?,?)";
+        try (Connection c = getConnection();
+             PreparedStatement pstmt = c.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)){
+            int pos = 0;
+
+            pstmt.setString(++pos, u.getNombre());
+            pstmt.setString(++pos, u.getApellidos());
+            pstmt.setInt(++pos, u.getOficio());
+
+            if(pstmt.executeUpdate()==0)
+                throw new SQLException("No se ha podido crear el usuario");
+
+            try(ResultSet rs = pstmt.getGeneratedKeys()){
+
+                if(rs.next())
+                    u.setIdUsuario(rs.getInt(1));
+                else {
+                    throw new SQLException("No se ha podido obtener el id asignado");
+                }
+
+                return u;
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public Usuario addNewUsuarioById(int idUsuario, Usuario u){
+        String sql = "INSERT INTO Usuario (idUsuario,nombre,apellidos,Oficio_idOficio) VALUES (?,?,?,?)";
+        try (Connection c = getConnection();
+             PreparedStatement pstmt = c.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)){
+            int pos = 0;
+
+            pstmt.setInt(++pos, idUsuario);
+            pstmt.setString(++pos, u.getNombre());
+            pstmt.setString(++pos, u.getApellidos());
+            pstmt.setInt(++pos, u.getOficio());
+
+            if(pstmt.executeUpdate()==0)
+                throw new SQLException("No se ha podido crear el usuario");
+
+            return u;
+
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }

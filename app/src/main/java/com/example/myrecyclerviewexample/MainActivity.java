@@ -71,30 +71,29 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     public void doInUI() {
                         hideProgress();
                         myRecyclerViewAdapter.notifyItemRemoved(position);
-                        myRecyclerViewAdapter.setUsuarios(Model.getInstance().getUsuarios());
+//                        myRecyclerViewAdapter.setUsuarios(Model.getInstance().getUsuarios());
+                        Snackbar.make(recyclerView, "Deleted " + u.getNombre(), Snackbar.LENGTH_LONG)
+                                .setAction("Undo", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        showProgress();
+                                        executeCall(new CallInterface() {
+                                            @Override
+                                            public void doInBackground() {
+                                                Model.getInstance().addUsuarioById(u.getIdUsuario(),u);
+                                            }
+
+                                            @Override
+                                            public void doInUI() {
+                                                hideProgress();
+                                                myRecyclerViewAdapter.notifyItemInserted(position);
+                                            }
+                                        });
+                                    }
+                                }).show();
                     }
                 });
 
-                Snackbar.make(recyclerView, "Deleted " + u.getNombre(), Snackbar.LENGTH_LONG)
-                        .setAction("Undo", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                showProgress();
-                                executeCall(new CallInterface() {
-                                    @Override
-                                    public void doInBackground() {
-                                        Model.getInstance().insertDeletedUser(position, u);
-                                    }
-
-                                    @Override
-                                    public void doInUI() {
-                                        hideProgress();
-                                        myRecyclerViewAdapter.notifyItemInserted(position);
-                                        myRecyclerViewAdapter.setUsuarios(Model.getInstance().getUsuarios());
-                                    }
-                                });
-                            }
-                        }).show();
             }
         });
 
@@ -106,7 +105,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     String operationToast = "";
 
                     if (result.getResultCode() == Activity.RESULT_OK) {
-                        myRecyclerViewAdapter.setUsuarios(Model.getInstance().getUsuarios());
                         myRecyclerViewAdapter.notifyDataSetChanged();
 
                         Intent data = result.getData();

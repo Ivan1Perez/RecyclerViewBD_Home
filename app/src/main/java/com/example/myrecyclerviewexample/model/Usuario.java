@@ -41,4 +41,16 @@ public class Usuario implements Serializable {
     public int getOficio() {
         return oficio;
     }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+
+    public void setOficio(int oficio) {
+        this.oficio = oficio;
+    }
 }
