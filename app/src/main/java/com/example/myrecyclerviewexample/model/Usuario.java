@@ -53,4 +53,13 @@ public class Usuario implements Serializable {
     public void setOficio(int oficio) {
         this.oficio = oficio;
     }
+
+    @Override
+    public boolean equals(Object obj){
+        if(!(obj instanceof Usuario))
+            return false;
+
+        Usuario u = (Usuario) obj;
+        return u.getIdUsuario()==getIdUsuario();
+    }
 }

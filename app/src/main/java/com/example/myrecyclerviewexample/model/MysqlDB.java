@@ -18,7 +18,7 @@ public class MysqlDB {
             throw new RuntimeException(e);
         }
 
-        return DriverManager.getConnection("jdbc:mysql://10.13.0.3:3306/java","iperez","1111");
+        return DriverManager.getConnection("jdbc:mysql://10.13.0.3:8080/java","jalonso","1111");
     }
 
     public List<Usuario> getAllUsers(){

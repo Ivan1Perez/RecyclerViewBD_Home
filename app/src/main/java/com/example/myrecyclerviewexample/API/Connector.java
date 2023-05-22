@@ -27,7 +27,7 @@ public class Connector{
     }
 
     public <T> List<T> getAsList(Class<T> clazz, String path){
-        String url = Parameters.URL + Parameters.URL_OPTIONS + path;
+        String url = Parameters.URL + path;
         String jsonResponse = callMethodsObject.get(url);
         if(jsonResponse != null)
             return conversor.fromJsonList(jsonResponse, clazz);
@@ -36,7 +36,7 @@ public class Connector{
 
 
     public <T> T get(Class<T> clazz, String path){
-        String url = Parameters.URL + Parameters.URL_OPTIONS + path;
+        String url = Parameters.URL + path;
         String jsonResponse = callMethodsObject.get(url);
         if(jsonResponse != null)
             return conversor.fromJson(jsonResponse, clazz);
@@ -44,7 +44,7 @@ public class Connector{
     }
 
     public <T> T post(Class<T> clazz, T data, String path){
-        String url = Parameters.URL + Parameters.URL_OPTIONS + path;
+        String url = Parameters.URL + path;
         String jsonObject = conversor.toJson(data);
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonObject);
         String jsonResponse = callMethodsObject.post(url, body);
@@ -54,7 +54,7 @@ public class Connector{
     }
 
     public <T> T put(Class<T> clazz, T data, String path){
-        String url = Parameters.URL + Parameters.URL_OPTIONS + path;
+        String url = Parameters.URL + path;
         String jsonObject = conversor.toJson(data);
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonObject);
         String jsonResponse = callMethodsObject.put(url, body);
@@ -64,7 +64,7 @@ public class Connector{
     }
 
     public <T> T delete(Class<T> clazz, String path){
-        String url = Parameters.URL + Parameters.URL_OPTIONS + path;
+        String url = Parameters.URL + path;
         String jsonResponse = callMethodsObject.delete(url);
         if(jsonResponse != null)
             return conversor.fromJson(jsonResponse, clazz);

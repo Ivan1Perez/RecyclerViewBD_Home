@@ -14,9 +14,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.myrecyclerviewexample.API.Connector;
 import com.example.myrecyclerviewexample.base.BaseActivity;
 import com.example.myrecyclerviewexample.base.CallInterface;
-import com.example.myrecyclerviewexample.model.Model;
+import com.example.myrecyclerviewexample.model.Oficio;
 import com.example.myrecyclerviewexample.model.Usuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -29,6 +30,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private MyRecyclerViewAdapter myRecyclerViewAdapter;
     private ActivityResultLauncher<Intent> detailActivityLauncher;
     private FloatingActionButton addUser;
+    private List<Usuario> usuarioList;
+    private List<Oficio> oficioList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,19 +62,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
 
-                Usuario u = Model.getInstance().getUsuarios().get(position);
                 showProgress();
                 executeCall(new CallInterface() {
+
+                    List<Usuario> usuarios;
+                    Usuario usuario;
                     @Override
                     public void doInBackground() {
-                        Model.getInstance().deleteUsuario(u);
+
+                        usuarios = Connector.getConector().getAsList(Usuario.class,"usuarios");
+                        Connector.getConector().delete(Usuario.class, "/usuarios/" + position);
+
                     }
 
                     @Override
                     public void doInUI() {
                         hideProgress();
                         myRecyclerViewAdapter.notifyItemRemoved(position);
-                        Snackbar.make(recyclerView, "Deleted " + u.getNombre(), Snackbar.LENGTH_LONG)
+                        usuario = usuarios.get(position);
+                        Snackbar.make(recyclerView, "Deleted " + usuario.getNombre(), Snackbar.LENGTH_LONG)
                                 .setAction("Undo", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
@@ -79,7 +88,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                                         executeCall(new CallInterface() {
                                             @Override
                                             public void doInBackground() {
-                                                Model.getInstance().addUsuarioById(u.getIdUsuario(),u);
+                                                Connector.getConector().post(Usuario.class, usuario, "/usuarios");
                                             }
 
                                             @Override
@@ -136,7 +145,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     public void onClick(View view) {
-        Usuario u = Model.getInstance().getUsuarios().get(recyclerView.getChildAdapterPosition(view));
+        Usuario u = usuarioList.get(recyclerView.getChildAdapterPosition(view));
 
         Intent intent = new Intent(getApplicationContext(), UserFormActivity.class);
         intent.putExtra("mode", UserFormActivity.MODE.UPDATE.toString());
@@ -150,15 +159,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void doInBackground() {
 
-        Model.getInstance().getUsuarios();
-        Model.getInstance().getOficios();
+        usuarioList = Connector.getConector().getAsList(Usuario.class,"usuarios");
+        oficioList = Connector.getConector().getAsList(Oficio.class, "oficios");
 
     }
 
     @Override
     public void doInUI() {
         hideProgress();
-        List<Usuario> usuarioList = Model.getInstance().getUsuarios();
         myRecyclerViewAdapter.setUsuarios(usuarioList);
     }
 }
