@@ -6,19 +6,19 @@ public class Usuario implements Serializable {
     private int idUsuario;
     private String nombre;
     private String apellidos;
-    private int oficio;
+    private int idOficio;
 
     public Usuario(String nombre, String apellidos, int oficio) {
         this.nombre = nombre;
         this.apellidos = apellidos;
-        this.oficio = oficio;
+        this.idOficio = oficio;
     }
 
     public Usuario(int idUsuario, String nombre, String apellidos, int oficio) {
         this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.apellidos = apellidos;
-        this.oficio = oficio;
+        this.idOficio = oficio;
     }
 
 
@@ -38,8 +38,8 @@ public class Usuario implements Serializable {
         return apellidos;
     }
 
-    public int getOficio() {
-        return oficio;
+    public int getIdOficio() {
+        return idOficio;
     }
 
     public void setNombre(String nombre) {
@@ -50,8 +50,8 @@ public class Usuario implements Serializable {
         this.apellidos = apellidos;
     }
 
-    public void setOficio(int oficio) {
-        this.oficio = oficio;
+    public void setIdOficio(int idOficio) {
+        this.idOficio = idOficio;
     }
 
     @Override

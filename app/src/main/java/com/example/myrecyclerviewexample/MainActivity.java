@@ -150,7 +150,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         Intent intent = new Intent(getApplicationContext(), UserFormActivity.class);
         intent.putExtra("mode", UserFormActivity.MODE.UPDATE.toString());
         intent.putExtra("user", u);
-        intent.putExtra("oficio", u.getOficio());
+        intent.putExtra("oficio", u.getIdOficio());
         detailActivityLauncher.launch(intent);
 
 //        Toast.makeText(this,"Clic en " + u.getOficio(),Toast.LENGTH_SHORT).show();

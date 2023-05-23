@@ -3,12 +3,14 @@ package com.example.myrecyclerviewexample.model;
 public class Oficio {
     private int idOficio;
     private String descripcion;
-    private byte[] imagen;
+    private String imagen;
     private String imageurl;
 
-    public Oficio(int idOficio, String descripcion) {
+    public Oficio(int idOficio, String descripcion, String imagen, String imageurl) {
         this.idOficio=idOficio;
         this.descripcion=descripcion;
+        this.imagen=imagen;
+        this.imageurl=imageurl;
     }
 
     public int getIdOficio() {
@@ -27,11 +29,11 @@ public class Oficio {
         this.descripcion = descripcion;
     }
 
-    public byte[] getImagen() {
+    public String getImagen() {
         return imagen;
     }
 
-    public void setImagen(byte[] imagen) {
+    public void setImagen(String imagen) {
         this.imagen = imagen;
     }
 
