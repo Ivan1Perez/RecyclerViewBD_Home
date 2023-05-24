@@ -60,7 +60,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         //Si los oficios están nulos contectamos con la bbdd en segundo plano para obtenerlos.
-        if(oficios.isEmpty()){
+        if (oficios.isEmpty()) {
             executeCall(new CallInterface() {
 
                 public void doInBackground() {
@@ -69,26 +69,32 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
                 @Override
                 public void doInUI() {
-                    Usuario u = list.get(position);
-
-                    Optional<Oficio> optionalOficio = oficios.stream()
-                            .filter(o -> o.getIdOficio() == u.getIdOficio())
-                            .findFirst();
-
-                    if (optionalOficio.isPresent()) {
-                        Oficio oficio = optionalOficio.get();
-                        holder.title.setText(u.getApellidos().concat(", ").concat(u.getNombre()));
-                        holder.subtitle.setText(
-                                oficio.getDescripcion()
-                        );
-
-                        //Concatenamos el atributo 'imageurl' a la url de ImageDownloader
-                        ImageDownloader.downloadImage("http://10.13.0.3/images/" + oficio.getImageurl(), holder.image);
-
-                    }
+                    updateData(holder, position);
                 }
             });
+        }  else updateData(holder,position);
+    }
+
+    private void updateData(ViewHolder holder, int position) {
+        Usuario u = list.get(position);
+
+        Optional<Oficio> optionalOficio = oficios.stream()
+                .filter(o -> o.getIdOficio() == u.getIdOficio())
+                .findFirst();
+
+        if (optionalOficio.isPresent()) {
+            Oficio oficio = optionalOficio.get();
+            holder.title.setText(u.getApellidos().concat(", ").concat(u.getNombre()));
+            holder.subtitle.setText(
+                    oficio.getDescripcion()
+            );
+
+            //Concatenamos el atributo 'imageurl' a la url de ImageDownloader
+            ImageDownloader.downloadImage("http://10.13.0.3/images/" + oficio.getImageurl(), holder.image);
+
         }
+
+
 
 
 

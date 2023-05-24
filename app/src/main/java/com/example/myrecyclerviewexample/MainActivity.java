@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -22,6 +23,7 @@ import com.example.myrecyclerviewexample.model.Usuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener, CallInterface {
@@ -37,6 +39,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        usuarioList = new ArrayList<>();
+        oficioList = new ArrayList<>();
 
         recyclerView = findViewById(R.id.recycler);
         addUser = findViewById(R.id.addUser);
@@ -65,13 +70,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 showProgress();
                 executeCall(new CallInterface() {
 
-                    List<Usuario> usuarios;
                     Usuario usuario;
                     @Override
                     public void doInBackground() {
 
-                        usuarios = Connector.getConector().getAsList(Usuario.class,"usuarios");
-                        Connector.getConector().delete(Usuario.class, "/usuarios/" + position);
+                        usuario = usuarioList.get(position);
+                        Connector.getConector().delete(Usuario.class, "usuarios/" + usuario.getIdUsuario());
+                        usuarioList.remove(position);
 
                     }
 
@@ -79,7 +84,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     public void doInUI() {
                         hideProgress();
                         myRecyclerViewAdapter.notifyItemRemoved(position);
-                        usuario = usuarios.get(position);
+                        Log.d("posicion1 usuario",String.valueOf(position));
+
                         Snackbar.make(recyclerView, "Deleted " + usuario.getNombre(), Snackbar.LENGTH_LONG)
                                 .setAction("Undo", new View.OnClickListener() {
                                     @Override
@@ -88,12 +94,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                                         executeCall(new CallInterface() {
                                             @Override
                                             public void doInBackground() {
-                                                Connector.getConector().post(Usuario.class, usuario, "/usuarios");
+                                                Log.d("usuario",usuario.toString());
+                                                Connector.getConector().post(Usuario.class, usuario, "usuarios");
+                                                usuarioList.add(position,usuario);
                                             }
 
                                             @Override
                                             public void doInUI() {
                                                 hideProgress();
+                                                Log.d("posicion usuario",String.valueOf(position));
                                                 myRecyclerViewAdapter.notifyItemInserted(position);
                                             }
                                         });
@@ -160,7 +169,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     public void doInBackground() {
 
         usuarioList = Connector.getConector().getAsList(Usuario.class,"usuarios");
-        oficioList = Connector.getConector().getAsList(Oficio.class, "oficios");
+//        oficioList = Connector.getConector().getAsList(Oficio.class, "oficios");
 
     }
 

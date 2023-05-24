@@ -68,7 +68,7 @@ public class UserFormActivity extends BaseActivity {
                 myAdapter = new ArrayAdapter<>(
                         UserFormActivity.this,
                         android.R.layout.simple_spinner_item,
-                        Connector.getConector().getAsList(Oficio.class, "/oficios")
+                        Connector.getConector().getAsList(Oficio.class, "oficios")
                 );
             }
 
