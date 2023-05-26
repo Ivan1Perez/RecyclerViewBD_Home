@@ -90,7 +90,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             );
 
             //Concatenamos el atributo 'imageurl' a la url de ImageDownloader
-            ImageDownloader.downloadImage("http://10.13.0.3/images/" + oficio.getImageurl(), holder.image);
+            ImageDownloader.downloadImage("http://192.168.1.36/images/" + oficio.getImageurl(), holder.image);
 
         }
 

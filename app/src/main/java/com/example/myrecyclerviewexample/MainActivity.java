@@ -1,5 +1,7 @@
 package com.example.myrecyclerviewexample;
 
+import static java.sql.Types.NULL;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -76,8 +78,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     public void doInBackground() {
 
                         usuario = usuarioList.get(position);
-                        Log.d("posicion",String.valueOf(position));
-                        Log.d("usuarioList size",String.valueOf(usuarioList.size()));
                         Connector.getConector().delete(Usuario.class, "usuarios/" + usuario.getIdUsuario());
                         usuarioList.remove(position);
 
@@ -145,6 +145,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                                 }
                             }else{
                                 usuarioRecibido = (Usuario) data.getSerializableExtra("usuarioAdded");
+                                if(usuarioRecibido.getIdUsuario()==NULL){
+                                    int idUsuario = usuarioList.get(usuarioList.size()-1).getIdUsuario()+1;
+                                    usuarioRecibido.setIdUsuario(idUsuario);
+                                }
                                 usuarioList.add(usuarioRecibido);
                             }
 

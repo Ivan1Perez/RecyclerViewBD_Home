@@ -19,6 +19,7 @@ import com.example.myrecyclerviewexample.model.Usuario;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.Serializable;
+import java.sql.Types;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -171,8 +172,8 @@ public class UserFormActivity extends BaseActivity {
                                 String apellidos = tietApellidos.getText().toString();
                                 Oficio oficio = (Oficio) spinner.getSelectedItem();
 
-                                Usuario usuarioAdd = new Usuario(nombre, apellidos, oficio.getIdOficio());
-                                apiResponse = Connector.getConector().post(Usuario.class, usuario, "usuarios");
+                                Usuario usuarioAdded = new Usuario(nombre, apellidos, oficio.getIdOficio());
+                                apiResponse = Connector.getConector().post(Usuario.class, usuarioAdded, "usuarios");
 
                                 if(apiResponse!=null){
                                     operationToast = "Usuario añadido con éxito";
@@ -183,7 +184,7 @@ public class UserFormActivity extends BaseActivity {
                                 }
 
                                 i.putExtra("addSuccessful", addSuccessful);
-                                i.putExtra("usuarioAdded", usuario);
+                                i.putExtra("usuarioAdded", usuarioAdded);
                                 i.putExtra("operationToast", operationToast);
                                 i.putExtra("operationCase", operationCase);
 
