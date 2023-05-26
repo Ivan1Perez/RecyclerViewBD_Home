@@ -25,6 +25,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener, CallInterface {
 
@@ -75,6 +76,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     public void doInBackground() {
 
                         usuario = usuarioList.get(position);
+                        Log.d("posicion",String.valueOf(position));
+                        Log.d("usuarioList size",String.valueOf(usuarioList.size()));
                         Connector.getConector().delete(Usuario.class, "usuarios/" + usuario.getIdUsuario());
                         usuarioList.remove(position);
 
@@ -84,7 +87,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     public void doInUI() {
                         hideProgress();
                         myRecyclerViewAdapter.notifyItemRemoved(position);
-                        Log.d("posicion1 usuario",String.valueOf(position));
 
                         Snackbar.make(recyclerView, "Deleted " + usuario.getNombre(), Snackbar.LENGTH_LONG)
                                 .setAction("Undo", new View.OnClickListener() {
@@ -94,7 +96,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                                         executeCall(new CallInterface() {
                                             @Override
                                             public void doInBackground() {
-                                                Log.d("usuario",usuario.toString());
                                                 Connector.getConector().post(Usuario.class, usuario, "usuarios");
                                                 usuarioList.add(position,usuario);
                                             }
@@ -102,7 +103,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                                             @Override
                                             public void doInUI() {
                                                 hideProgress();
-                                                Log.d("posicion usuario",String.valueOf(position));
                                                 myRecyclerViewAdapter.notifyItemInserted(position);
                                             }
                                         });
@@ -118,16 +118,38 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
         detailActivityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    boolean operationSuccessful = false;
-                    String operationToast = "";
 
                     if (result.getResultCode() == Activity.RESULT_OK) {
-                        myRecyclerViewAdapter.notifyDataSetChanged();
+                        boolean operationSuccessful = false;
+                        String operationToast;
+                        String operationCase;
+                        Usuario usuarioRecibido;
+
+                        operationToast = "Error al actualizar el usuario";
 
                         Intent data = result.getData();
                         if (data != null) {
                             operationSuccessful = data.getBooleanExtra("addSuccessful", false);
                             operationToast = data.getStringExtra("operationToast");
+                            operationCase = data.getStringExtra("operationCase");
+
+                            if(operationCase.equals("updateUser")){
+                                usuarioRecibido = (Usuario) data.getSerializableExtra("usuarioActualizado");
+
+                                //Borramos el usuario desactualizado de la tabla de usuarios y añadimos el actualizado en
+                                //su posición.
+                                int index = usuarioList.indexOf(usuarioRecibido);
+                                if (index != -1) {
+                                    usuarioList.remove(index);
+                                    usuarioList.add(index, usuarioRecibido);
+                                }
+                            }else{
+                                usuarioRecibido = (Usuario) data.getSerializableExtra("usuarioAdded");
+                                usuarioList.add(usuarioRecibido);
+                            }
+
+                            myRecyclerViewAdapter.notifyDataSetChanged();
+
                         }
 
                         if (operationSuccessful) {
@@ -156,10 +178,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     public void onClick(View view) {
         Usuario u = usuarioList.get(recyclerView.getChildAdapterPosition(view));
 
+        //Para pasar el oficio primero recogemos la lista de oficios ya creada en 'myRecyclerView'
+        Oficio o = myRecyclerViewAdapter.getOficios().get(u.getIdOficio()-1);
+
         Intent intent = new Intent(getApplicationContext(), UserFormActivity.class);
         intent.putExtra("mode", UserFormActivity.MODE.UPDATE.toString());
+        intent.putExtra("oficio", o);
         intent.putExtra("user", u);
-        intent.putExtra("oficio", u.getIdOficio());
         detailActivityLauncher.launch(intent);
 
 //        Toast.makeText(this,"Clic en " + u.getOficio(),Toast.LENGTH_SHORT).show();
@@ -178,4 +203,5 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         hideProgress();
         myRecyclerViewAdapter.setUsuarios(usuarioList);
     }
+
 }

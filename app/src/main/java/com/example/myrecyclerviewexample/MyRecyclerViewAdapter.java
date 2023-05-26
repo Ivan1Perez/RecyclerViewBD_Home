@@ -94,10 +94,6 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
         }
 
-
-
-
-
     }
 
     @Override
@@ -111,6 +107,10 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     public void setUsuarios(List<Usuario> usuarioList) {
         this.list = usuarioList;
+    }
+
+    public List<Oficio> getOficios() {
+        return oficios;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

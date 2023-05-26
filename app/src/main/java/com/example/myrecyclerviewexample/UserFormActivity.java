@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import com.example.myrecyclerviewexample.model.Usuario;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,6 +38,8 @@ public class UserFormActivity extends BaseActivity {
     private Spinner spinner;
     protected ExecutorService executor = Executors.newSingleThreadExecutor();
     protected Handler handler = new Handler(Looper.getMainLooper());
+    private ArrayAdapter<Oficio> myAdapter;
+    private String operationCase;
 
     protected void executeCall(CallInterface callInterface){
         executor.execute(() -> {
@@ -62,7 +66,7 @@ public class UserFormActivity extends BaseActivity {
 
 
         executeCall(new CallInterface() {
-            ArrayAdapter<Oficio> myAdapter;
+
             @Override
             public void doInBackground() {
                 myAdapter = new ArrayAdapter<>(
@@ -70,27 +74,29 @@ public class UserFormActivity extends BaseActivity {
                         android.R.layout.simple_spinner_item,
                         Connector.getConector().getAsList(Oficio.class, "oficios")
                 );
+
             }
 
             @Override
             public void doInUI() {
                 spinner.setAdapter(myAdapter);
+
+                switch (mode){
+                    case UPDATE:
+                        usuario = (Usuario) getIntent().getExtras().getSerializable("user");
+                        Oficio oficio = (Oficio) getIntent().getExtras().getSerializable("oficio");
+                        tietNombre.setText(usuario.getNombre());
+                        tietApellidos.setText(usuario.getApellidos());
+                        spinner.setSelection(myAdapter.getPosition(oficio));
+                        btnAdd.setVisibility(View.GONE);
+                        break;
+                    case CREATE:
+                        btnUpdate.setVisibility(View.GONE);
+                        break;
+
+                }
             }
         });
-
-
-        switch (mode){
-            case UPDATE:
-                usuario = (Usuario) getIntent().getExtras().getSerializable("user");
-                tietNombre.setText(usuario.getNombre());
-                tietApellidos.setText(usuario.getApellidos());
-                btnAdd.setVisibility(View.GONE);
-                break;
-            case CREATE:
-                btnUpdate.setVisibility(View.GONE);
-                break;
-
-        }
 
         btnCancelar.setOnClickListener(
                 view -> finish()
@@ -101,39 +107,45 @@ public class UserFormActivity extends BaseActivity {
                     if(tietNombre.getText().length()==0 || tietApellidos.getText().length()==0){
                         Toast.makeText(this,"Por favor, rellene los dos campos.",Toast.LENGTH_SHORT).show();
                     }else{
+                        Intent i = new Intent();
+                        String nombre = tietNombre.getText().toString();
+                        String apellidos = tietApellidos.getText().toString();
+                        Oficio oficio = (Oficio) spinner.getSelectedItem();
+                        usuario.setNombre(nombre);
+                        usuario.setApellidos(apellidos);
+                        usuario.setIdOficio(oficio.getIdOficio());
                         showProgress();
                         executeCall(new CallInterface() {
+                            Object apiResponse;
+                            boolean addSuccessful = false;
+                            String operationToast;
                             @Override
                             public void doInBackground() {
-                                Object apiResponse;
-                                boolean addSuccessful = false;
-                                String operationToast;
-                                Intent i = new Intent();
-                                String nombre = tietNombre.getText().toString();
-                                String apellidos = tietApellidos.getText().toString();
-                                Oficio oficio = (Oficio) spinner.getSelectedItem();
 
-                                Usuario usuarioModificado = new Usuario(usuario.getIdUsuario(), nombre, apellidos, oficio.getIdOficio());
+//                                Usuario usuarioModificado = new Usuario(usuario.getIdUsuario(), nombre, apellidos, oficio.getIdOficio());
 
-                                apiResponse = Connector.getConector().put(Usuario.class, usuarioModificado, "/usuarios");
-
-                                if(apiResponse!=null){
-                                    operationToast = "Usuario actualizado con éxito";
-                                    addSuccessful = true;
-                                }else{
-                                    operationToast = "Error al actualizar el usuario";
-                                }
-
-                                i.putExtra("addSuccessful", addSuccessful);
-                                i.putExtra("operationToast", operationToast);
-
-                                setResult(RESULT_OK,i);
+                                apiResponse = Connector.getConector().put(Usuario.class, usuario, "usuarios");
 
                             }
 
                             @Override
                             public void doInUI() {
                                 hideProgress();
+                                if(apiResponse!=null){
+                                    operationToast = "Usuario actualizado con éxito";
+                                    operationCase = "updateUser";
+                                    addSuccessful = true;
+                                }else{
+                                    operationToast = "Error al actualizar el usuario";
+                                }
+
+
+                                i.putExtra("addSuccessful", addSuccessful);
+                                i.putExtra("operationToast", operationToast);
+                                i.putExtra("operationCase", operationCase);
+                                i.putExtra("usuarioActualizado", usuario);
+
+                                setResult(RESULT_OK,i);
                                 finish();
                             }
                         });
@@ -159,18 +171,21 @@ public class UserFormActivity extends BaseActivity {
                                 String apellidos = tietApellidos.getText().toString();
                                 Oficio oficio = (Oficio) spinner.getSelectedItem();
 
-                                Usuario usuario = new Usuario(nombre, apellidos, oficio.getIdOficio());
-                                apiResponse = Connector.getConector().post(Usuario.class, usuario, "/usuarios");
+                                Usuario usuarioAdd = new Usuario(nombre, apellidos, oficio.getIdOficio());
+                                apiResponse = Connector.getConector().post(Usuario.class, usuario, "usuarios");
 
                                 if(apiResponse!=null){
                                     operationToast = "Usuario añadido con éxito";
+                                    operationCase = "addUser";
                                     addSuccessful = true;
                                 }else{
                                     operationToast = "Error al añadir el usuario";
                                 }
 
                                 i.putExtra("addSuccessful", addSuccessful);
+                                i.putExtra("usuarioAdded", usuario);
                                 i.putExtra("operationToast", operationToast);
+                                i.putExtra("operationCase", operationCase);
 
                                 setResult(RESULT_OK,i);
 
