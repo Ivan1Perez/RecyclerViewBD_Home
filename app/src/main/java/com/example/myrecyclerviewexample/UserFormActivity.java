@@ -6,14 +6,17 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.myrecyclerviewexample.API.Connector;
 import com.example.myrecyclerviewexample.base.BaseActivity;
 import com.example.myrecyclerviewexample.base.CallInterface;
+import com.example.myrecyclerviewexample.base.ImageDownloader;
 import com.example.myrecyclerviewexample.model.Oficio;
 import com.example.myrecyclerviewexample.model.Usuario;
 import com.google.android.material.textfield.TextInputEditText;
@@ -37,6 +40,7 @@ public class UserFormActivity extends BaseActivity {
     private TextInputEditText tietApellidos;
     private TextInputEditText tietNombre;
     private Spinner spinner;
+    private ImageView imageViewForm;
     protected ExecutorService executor = Executors.newSingleThreadExecutor();
     protected Handler handler = new Handler(Looper.getMainLooper());
     private ArrayAdapter<Oficio> myAdapter;
@@ -64,6 +68,7 @@ public class UserFormActivity extends BaseActivity {
         tietNombre = findViewById(R.id.tietNombre);
         tietApellidos = findViewById(R.id.tietApellidos);
         spinner = findViewById(R.id.spinner);
+        imageViewForm = findViewById(R.id.imageViewForm);
 
 
         executeCall(new CallInterface() {
@@ -89,6 +94,7 @@ public class UserFormActivity extends BaseActivity {
                         tietNombre.setText(usuario.getNombre());
                         tietApellidos.setText(usuario.getApellidos());
                         spinner.setSelection(myAdapter.getPosition(oficio));
+                        ImageDownloader.downloadImage("http://192.168.1.36/images/" + oficio.getImageurl(), imageViewForm);
                         btnAdd.setVisibility(View.GONE);
                         break;
                     case CREATE:
@@ -99,12 +105,27 @@ public class UserFormActivity extends BaseActivity {
             }
         });
 
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Oficio oficio = (Oficio) spinner.getSelectedItem();
+                ImageDownloader.downloadImage("http://192.168.1.36/images/" + oficio.getImageurl(), imageViewForm);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Este método se llama cuando no se ha seleccionado ningún elemento.
+                // Puedes dejarlo vacío si no necesitas realizar ninguna acción en este caso.
+            }
+        });
+
         btnCancelar.setOnClickListener(
                 view -> finish()
         );
 
         btnUpdate.setOnClickListener(
                 v-> {
+
                     if(tietNombre.getText().length()==0 || tietApellidos.getText().length()==0){
                         Toast.makeText(this,"Por favor, rellene los dos campos.",Toast.LENGTH_SHORT).show();
                     }else{
@@ -122,8 +143,6 @@ public class UserFormActivity extends BaseActivity {
                             String operationToast;
                             @Override
                             public void doInBackground() {
-
-//                                Usuario usuarioModificado = new Usuario(usuario.getIdUsuario(), nombre, apellidos, oficio.getIdOficio());
 
                                 apiResponse = Connector.getConector().put(Usuario.class, usuario, "usuarios");
 
