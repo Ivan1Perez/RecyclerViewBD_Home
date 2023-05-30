@@ -221,7 +221,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
             case R.id.settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
-                detailActivityLauncher.launch(intent);
+                startActivity(intent);
                 return true;
 
             case R.id.exit: finish();

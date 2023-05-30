@@ -7,7 +7,11 @@ public class Parameters {
 
     public final static String LANG = "es";
     public final static String UNITS = "metric";
-    public final static String URL = "http://192.168.1.36:8080/api/";
+    public static String IP = "192.168.1.36";
+    public static String PORT = "8080";
+    public static String PREFIX = IP + ":" + PORT;
+
+    public final static String URL = "http://" + PREFIX + "/api/";
     public final static String URL_OPTIONS = "forecast?appid=" + API + "&lang=" + LANG + "&units=" + UNITS;
 
     public final static String ICON_URL_PRE = "http://openweathermap.org/img/wn/";
